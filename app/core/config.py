@@ -4,6 +4,8 @@ class Settings(BaseSettings):
     APP_NAME: str = "School ERP API"
     DEBUG: bool = True
 
+    ALGORITHM : str
+
     # Database
     DATABASE_URL: str
 

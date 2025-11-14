@@ -4,7 +4,7 @@ from typing import Annotated
 
 class UserCreate(BaseModel):
     username: Annotated[str, Field(min_length=3, max_length=20)]
-    name: Annotated[str, Field(max_length=10)]
+    name: Annotated[str, Field(min_length=3, max_length=10)]
     email: EmailStr
     # is_active: bool = False
     # is_superuser: bool = False
@@ -31,5 +31,5 @@ class UserRead(BaseModel):
     is_active: bool
     is_superuser: bool
 
-    # class Config:
-    #     orm_mode = True
+    class Config:
+        orm_mode = True

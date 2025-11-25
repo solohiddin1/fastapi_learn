@@ -6,6 +6,7 @@ class UserCreate(BaseModel):
     username: Annotated[str, Field(min_length=3, max_length=20)]
     name: Annotated[str, Field(min_length=3, max_length=10)]
     email: EmailStr
+    password: Annotated[str, Field(min_length=3, max_length=20)]
     # is_active: bool = False
     # is_superuser: bool = False
 
@@ -33,3 +34,15 @@ class UserRead(BaseModel):
 
     class Config:
         orm_mode = True
+
+class UserOut(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+
+    class Config:
+        orm_mode = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

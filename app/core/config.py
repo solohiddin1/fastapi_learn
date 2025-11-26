@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     EMAIL_USER: str
     EMAIL_PASSWORD: str
 
+    FASTAPI_ADMIN_SECRET: str
+    
+
     class Config:
         env_file = ".env"
 

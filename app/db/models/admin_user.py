@@ -4,8 +4,8 @@ from sqlalchemy.orm import relationship
 from .basemodel import BaseModel
 from .post import Post
 
-class User(BaseModel):
-    __tablename__ = 'users'
+class AdminUser(BaseModel):
+    __tablename__ = 'admin_users'
 
     username = Column(String)
     name = Column(String)

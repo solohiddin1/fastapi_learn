@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 
 from app.db.models.user import User
@@ -13,12 +13,24 @@ from app.crud.user_crud import get_current_user
 router = APIRouter()
 
 
-oath2_scheme = OAuth2PasswordBearer(tokenUrl='/api/v1/auth/login')
+# oath2_scheme = OAuth2PasswordBearer(tokenUrl='/api/v1/auth/login')
 
-@router.get('/items/')
+@router.get('/check/')
 async def get_items(user = Depends(get_current_user)):
-    return {"token": 'You are authenticated', "user": user}
+    return {
+        "token": 'You are authenticated', 
+        # "user": user
+            }
 
+@router.get('/get_profile/')
+async def get_profile(db = Depends(get_db), user=Depends(get_current_user)):
+    print(user)
+    profile = db.query(User).filter(User.username == user[0]).first()
+    # profile = db.query(User).all()
+    if profile:
+        return profile
+    else:
+        return Response(status_code=400, content={'detail': 'User not found'})
 
 @router.post('/login/')
 async def login(username: str, password: str, db = Depends(get_db)):

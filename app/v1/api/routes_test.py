@@ -6,14 +6,17 @@ from app.v1.deps import get_db
 
 from app.db.models.user import User
 from app.schemas.user import UserCreate
+from app.crud.user_crud import get_current_user
 
-router = APIRouter()
+router = APIRouter(
+    dependencies=[Depends(get_current_user)]
+)
 
 @router.get("/hello_world/")
 async def hello_world(db = Depends(get_db)):
     logger.info("hello world endpoint was called")
     return db.query(User).all()
-    # return 'Hello world!'
+
 
 # @router.post('/add_user')
 # async def add_user(user: UserCreate, db = Depends(get_db)):

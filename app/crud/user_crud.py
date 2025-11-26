@@ -33,15 +33,15 @@ def authenticate_user(db: Session, username: str, password: str):
 
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    # user = db.query(User).filter(User.username == "dummy").first()
-    # if not user:
-    #     raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+    """it was put here cause in one api it was 
+    not seeing token so i turned off auto error in router, 
+    now its useless"""
+    # if not credentials:
+    #     raise HTTPException(status_code=401, detail='No token was provided')
     token = credentials.credentials
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        print(payload)
         user = payload.get("sub")
-        print(user)
         if user is None:
             raise HTTPException(status_code=401, detail="Invalid token credentials")
     except ExpiredSignatureError:

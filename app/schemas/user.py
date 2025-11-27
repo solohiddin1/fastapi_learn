@@ -33,15 +33,17 @@ class UserRead(BaseModel):
     is_superuser: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserOut(BaseModel):
     id: int
     username: str
     email: EmailStr
+    is_active: bool
+    is_verified: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Token(BaseModel):
     access_token: str

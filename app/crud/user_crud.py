@@ -5,6 +5,7 @@ from app.core.config import settings
 from jose import jwt, ExpiredSignatureError
 from app.db.models.user import User
 from app.core.security import hash_password, verify_password
+from app.db.session import SessionLocal
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Depends, HTTPException
@@ -16,12 +17,26 @@ def create_user(db: Session, username: str, email: str, name: str, password: str
         username=username,
         name=name,
         email=email,
-        hashed_password=hash_password(password)
+        hashed_password=hash_password(password),
+        is_active=False,
+        is_verified=False
     )
     db.add(userin)
     db.commit()
     db.refresh(userin)
     return userin
+
+def activate_user(db: Session, username: str):
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        return False
+
+    if not user.is_active:
+        user.is_active = True
+        db.commit()
+        db.refresh(user)
+        return user
+    return None
 
 def authenticate_user(db: Session, username: str, password: str):
     user = db.query(User).filter(User.username == username).first()
@@ -44,11 +59,16 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         user = payload.get("sub")
         if user is None:
             raise HTTPException(status_code=401, detail="Invalid token credentials")
+        db = SessionLocal()
+        user_in = db.query(User).filter(User.username == user).first()
     except ExpiredSignatureError:
         logger.error("Token has expired")
         raise HTTPException(status_code=401, detail="Token has expired")
     except Exception as e:
         logger.error(f"Token decoding error: {e}")
         raise HTTPException(status_code=401, detail="Invalid token credentials")
+    
+    if user_in:
+        return user_in
     
     return token

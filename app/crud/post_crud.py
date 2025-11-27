@@ -21,7 +21,6 @@ def create_post(db: Session, title: str=None,
 
     return post
 
-
 def show_posts(db: Session):
     posts = db.query(Post).all()
     posts = [PostOut.from_orm(p).model_dump() for p in posts] # to show multiple posts

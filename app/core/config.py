@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str
 
     # Security
-    SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60*24  # 1 day
+    SECRET_KEY: str
 
     # CORS
     ALLOWED_HOSTS: list[str] = ["*"]

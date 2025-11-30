@@ -1,6 +1,6 @@
 from app.db.models.post import Post
 from sqlalchemy.orm import Session
-from app.schemas.posts import PostOut
+from app.schemas.posts import PostOut, PostOutDetail
 from fastapi import Depends
 from app.v1.deps import get_db
 from app.db.models.user import User
@@ -37,7 +37,7 @@ def show_my_posts(db: Session, user_id: int):
 def show_post_detail(id: int, db=Session):
     post = db.query(Post).filter(Post.id == id).first()
     if post:
-        return PostOut.from_orm(post).model_dump()
+        return PostOutDetail.from_orm(post).model_dump(mode="json")
     else:
         return None
 
@@ -46,10 +46,8 @@ def update_post(id: int, data:dict = None, db=Session, current_user:int=None):
 
     if not post:
         return None
-    print('00000000')
     if post.user_id is None:
         return error_response(data='post does not belong to you', status_code=400)
-    print(current_user.id)
     if post.user_id != current_user.id or current_user.is_superuser:
         raise error_response(data='You can update posts only that belong to you',status_code=401)
     for key, value in data.model_dump(exclude_unset=True).items():

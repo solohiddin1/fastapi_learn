@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Annotated, Optional
 from .user import UserOut
-
+from datetime import datetime
 
 class PostCreate(BaseModel):
     title: Annotated[str, Field(min_length=1, max_length=100)]
@@ -11,6 +11,18 @@ class PostCreate(BaseModel):
 class PostOut(BaseModel):
     title: str
     text: str
+    user_id: Optional[int] = None
+    user : Optional[UserOut] = None
+
+    class Config:
+        from_attributes = True
+
+class PostOutDetail(BaseModel):
+    id: int
+    title: str
+    text: str
+    created_at: datetime
+    updated_at: datetime
     user_id: Optional[int] = None
     user : Optional[UserOut] = None
 

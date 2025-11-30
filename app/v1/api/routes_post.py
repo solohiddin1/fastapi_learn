@@ -41,6 +41,8 @@ async def post_detail(id: int,
                       ):
     logger.info("post detail is called")
     post = show_post_detail(id=id, db=db)
+    if not post:
+        return error_response(data='post not found!', status_code=404)
     return success_response(post)
     
 

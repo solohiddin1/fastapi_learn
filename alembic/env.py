@@ -26,6 +26,8 @@ from app.db.base import Base
 from app.db.models.user import User
 from app.db.models.post import Post
 from app.db.models.like_post import Like
+from examples.models import Admin
+from app.db.models.admin_user import AdminUser
 target_metadata = Base.metadata
 
 # target_metadata = None

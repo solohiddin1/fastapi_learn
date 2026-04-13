@@ -9,6 +9,7 @@ class PostCreate(BaseModel):
 
 
 class PostOut(BaseModel):
+    id: int
     title: str
     text: str
     user_id: Optional[int] = None

@@ -1,16 +1,16 @@
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from jose import jwt, ExpiredSignatureError
 from sqlalchemy.orm import Session
 
-from app.core.logging_config import logger
 from app.core.config import settings
-from jose import jwt, ExpiredSignatureError
-from app.db.models.user import User
+from app.core.logging_config import logger
 from app.core.security import hash_password, verify_password
+from app.db.models.user import User
 from app.db.session import SessionLocal
 
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi import Depends, HTTPException
-
 security = HTTPBearer()
+
 
 def create_user(db: Session, username: str, email: str, name: str, password: str):
     userin = User(
@@ -26,6 +26,7 @@ def create_user(db: Session, username: str, email: str, name: str, password: str
     db.refresh(userin)
     return userin
 
+
 def activate_user(db: Session, username: str):
     user = db.query(User).filter(User.username == username).first()
     if not user:
@@ -37,6 +38,7 @@ def activate_user(db: Session, username: str):
         db.refresh(user)
         return user
     return None
+
 
 def authenticate_user(db: Session, username: str, password: str):
     user = db.query(User).filter(User.username == username).first()
@@ -67,8 +69,18 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
     except Exception as e:
         logger.error(f"Token decoding error: {e}")
         raise HTTPException(status_code=401, detail="Invalid token credentials")
-    
+
     if user_in:
         return user_in
-    
+
     return token
+
+
+def reset_user_password(db: Session, username: str, new_password: str):
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        return False
+    user.hashed_password = hash_password(new_password)
+    db.commit()
+    db.refresh(user)
+    return user

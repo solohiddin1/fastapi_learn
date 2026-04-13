@@ -1,8 +1,6 @@
-from pydantic import BaseModel
-from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
+from sqlalchemy import Column, String, Boolean
 from sqlalchemy.orm import relationship
 from .basemodel import BaseModel
-from .post import Post
 
 class User(BaseModel):
     __tablename__ = 'users'

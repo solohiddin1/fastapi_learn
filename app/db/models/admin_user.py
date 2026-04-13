@@ -1,10 +1,9 @@
-from pydantic import BaseModel
-from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
+from fastapi_admin.models import AbstractAdmin
+from sqlalchemy import Column, String, Boolean
 from sqlalchemy.orm import relationship
-from .basemodel import BaseModel
-from .post import Post
 
-class AdminUser(BaseModel):
+
+class AdminUser(AbstractAdmin):
     __tablename__ = 'admin_users'
 
     username = Column(String)

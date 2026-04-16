@@ -42,9 +42,9 @@ async def startup():
     )
 
 
-admin = SQLAdmin(app, engine)
+admin = SQLAdmin(app, engine, base_url="/api/v1/admin", title="FastAdmin", logo_url="/logo.png")
 
-app.mount("/admin", admin_app)
+# app.mount("/api/v1/admin", admin_app)
 app.add_middleware(ProcessTimeMiddleware)
 admin.add_view(UserAdmin)
 admin.add_view(PostAdmin)

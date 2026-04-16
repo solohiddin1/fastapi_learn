@@ -2,7 +2,8 @@ from sqlalchemy.orm import Session
 
 from app.db.models.post import Post
 from app.schemas.posts import PostOut, PostOutDetail
-from app.utils import error_response
+from app.utils.enum import ResultCodes
+from app.utils.utils import error_response
 
 
 def create_post(db: Session, title: str,
@@ -44,11 +45,14 @@ def show_post_detail(id: int, db=Session):
 
 
 def update_post(id: int, data: dict = None, db: Session = None, current_user: int = None):
-    post = db.query(Post).filter(Post.id == id, Post.user_id == current_user.id).first()
+    post = db.query(Post).filter(Post.id == id).first()
     if not post:
         return None
     if post.user_id != current_user.id and not current_user.is_superuser:
-        return error_response(data='You can update posts only that belong to you', status_code=401)
+        return error_response(
+            result=ResultCodes.PERMISSION_DENIED,
+            message={'detail': 'You can update posts only that belong to you'}
+        )
     for key, value in data.model_dump(exclude_unset=True).items():
         setattr(post, key, value)
 

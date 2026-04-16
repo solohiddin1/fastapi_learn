@@ -21,7 +21,7 @@ class ProcessTimeMiddleware(BaseHTTPMiddleware):
             response_body += chunk
 
         content_type = response.headers.get("Content-Type", "")
-        if "application/json" in content_type or "text/" in content_type:
+        if "application/json" in content_type:
             try:
                 decoded_body = json.loads(response_body.decode("utf-8"))
             except Exception:

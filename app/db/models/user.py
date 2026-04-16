@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Boolean
 from sqlalchemy.orm import relationship
-from .basemodel import BaseModel
+from app.db.models.basemodel import BaseModel
 
 class User(BaseModel):
     __tablename__ = 'users'
@@ -12,4 +12,5 @@ class User(BaseModel):
     is_active = Column(Boolean, default=False)
     is_superuser = Column(Boolean, default=False)
     is_verified = Column(Boolean, default=False)
+    is_developer = Column(Boolean, default=False)
     posts = relationship('Post', back_populates='user')

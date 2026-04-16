@@ -1,32 +1,27 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    APP_NAME: str = "School ERP API"
+    APP_NAME: str = "ERP API"
     DEBUG: bool = True
 
     ALGORITHM : str
 
-    # Database
     DATABASE_URL: str
 
-    # Security
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60*24  # 1 day
     SECRET_KEY: str
 
-    # CORS
     ALLOWED_HOSTS: list[str] = ["*"]
 
-    # Optional external services
-    EMAIL_HOST: str = "smtp.example.com"
-    EMAIL_PORT: int = 587
-    EMAIL_USER: str
-    EMAIL_PASSWORD: str
+    SMTP_HOST: str = "smtp.example.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str
+    SMTP_PASSWORD: str
 
     FASTAPI_ADMIN_SECRET: str
-    
+
 
     class Config:
         env_file = ".env"
 
-# Create a single instance to import anywhere
 settings = Settings()

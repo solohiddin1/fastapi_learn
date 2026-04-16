@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.core.logging_config import logger
@@ -8,12 +9,13 @@ from app.crud.post_crud import create_post, show_posts, \
 from app.crud.user_crud import get_current_user
 from app.db.models.user import User
 from app.schemas.posts import PostCreate, PostOut
-from app.utils import success_response, error_response
+from app.utils.enum import ResultCodes
+from app.utils.utils import success_response, error_response
 from app.v1.deps import get_db
 
 router = APIRouter(
     prefix='',
-    # tags=['posts'],
+    tags=['posts'],
     # dependencies=[Depends(get_current_user)]
 )
 
@@ -41,7 +43,7 @@ async def post_detail(id: int,
     logger.info("post detail is called")
     post = show_post_detail(id=id, db=db)
     if not post:
-        return error_response(data='post not found!', status_code=404)
+        return error_response(result=ResultCodes.POST_NOT_FOUND, message={'detail': 'post not found!'})
     return success_response(post)
 
 
@@ -54,11 +56,11 @@ async def post_update(id: int,
     post = update_post(id=id, data=data,
                        db=db,
                        current_user=current_user)
-    if not post:
-        return error_response(data='post not found!', status_code=404)
-    if post:
-        return success_response(PostOut.model_validate(post).model_dump())
-    return None
+    if post is None:
+        return error_response(result=ResultCodes.POST_NOT_FOUND, message={'detail': 'post not found!'})
+    if isinstance(post, JSONResponse):
+        return post
+    return success_response(PostOut.model_validate(post).model_dump())
 
 
 @router.post('/post_create/')

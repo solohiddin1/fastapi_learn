@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends
 
 from app.core.jwt import create_access_token
 from app.core.logging_config import logger
@@ -6,11 +6,11 @@ from app.crud.user_crud import create_user, authenticate_user, activate_user, re
 from app.crud.user_crud import get_current_user
 from app.db.models.user import User
 from app.schemas.user import UserCreate, UserOut
-from app.utils import success_response
+from app.utils.enum import ResultCodes
+from app.utils.utils import success_response, error_response
 from app.v1.deps import get_db
 
 router = APIRouter()
-
 
 # oath2_scheme = OAuth2PasswordBearer(tokenUrl='/api/v1/auth/login')
 
@@ -28,7 +28,7 @@ async def get_profile(db=Depends(get_db), user=Depends(get_current_user)):
     if profile:
         return profile
     else:
-        return Response(status_code=400, content={'detail': 'User not found'})
+        return error_response(result=ResultCodes.USER_NOT_FOUND, message={'detail': 'User not found'})
 
 
 @router.post('/login/')
@@ -36,7 +36,7 @@ async def login(username: str, password: str, db=Depends(get_db)):
     auth_user = authenticate_user(db, username, password)
 
     if not auth_user:
-        raise HTTPException(status_code=400, detail="Invalid credentials")
+        return error_response(result=ResultCodes.INVALID_CREDENTIALS, message={'detail': 'Invalid username or password'})
     if auth_user.is_active == False:
         activate_user(db, username)
 
@@ -48,14 +48,14 @@ async def login(username: str, password: str, db=Depends(get_db)):
 async def register(user: UserCreate, db=Depends(get_db)):
     existing_user = db.query(User).filter(User.username == user.username).first()
     if existing_user:
-        raise HTTPException(status_code=400, detail="User already exists")
+        return error_response(result=ResultCodes.USER_ALREADY_EXISTS, message={"detail": "User already exists"})
     try:
         user_in = create_user(db, username=user.username,
                               email=user.email, name=user.name,
                               password=user.password)
     except Exception as e:
         logger.error(f"Error creating user: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+        return error_response(result=ResultCodes.FAIL, message={"detail": str(e)})
     response = UserOut(
         id=user_in.id,
         username=user_in.username,
@@ -73,11 +73,11 @@ async def get_all_users(db=Depends(get_db)):
     return success_response(data=users)
 
 
-@router.get('/reset-password/', response_model=UserOut)
+@router.get('/reset-password/', response_model=UserOut, dependencies=[Depends(get_current_user)])
 async def reset_password(username: str, new_password: str, db=Depends(get_db)):
     user = reset_user_password(db, username, new_password)
     # response = UserOut(user)
     if user:
         return user
     else:
-        return Response(status_code=400, content={'detail': 'User not found'})
+        return error_response(result=ResultCodes.USER_NOT_FOUND, message={'detail': 'User not found'})
